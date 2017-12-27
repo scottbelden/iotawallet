@@ -91,26 +91,6 @@ class Wallet:
             'duplicate': self._account.duplicate_bundles,
         }
 
-    def retry_unconfirmed_bundles(self,
-                                  *bundles: Bundle) -> None:
-        if len(bundles) == 0:
-            bundles = tuple(self.bundles['unconfirmed'])
-        for bundle in bundles:
-            print(f'Retrying bundle: {bundle.hash}')
-            if not self._is_promotable(bundle):
-                bundle = self._reattach(bundle)
-                while True:
-                    time.sleep(2)
-                    if self._is_promotable(bundle):
-                        break
-            for attempt in range(5):
-                try:
-                    promote_bundle = self._promote(bundle)
-                except BundleAlreadyPromoted:
-                    break
-                else:
-                    print(f'Promotion attempt ({attempt}): Bundle {promote_bundle.hash}')
-
     def _get_account(self) -> _Account:
         response = self._iota_api.get_account_data(inclusion_states=True)
         addresses = response['addresses']
@@ -132,14 +112,6 @@ class Wallet:
             self._is_above_max_depth(bundle.tail_transaction) and
             self._iota_api.is_promotable(bundle.tail_transaction.hash)
         )
-
-    def _reattach(self,
-                  bundle: Bundle) -> Bundle:
-        response = self._iota_api.replay_bundle(
-            bundle.tail_transaction.hash,
-            DEPTH,
-        )
-        return Bundle.from_tryte_strings(response['trytes'])
 
     def _promote(self,
                  bundle: Bundle) -> Bundle:
@@ -164,21 +136,40 @@ class Wallet:
         )
         return response['bundle']
 
-    # def get_new_address(self) -> Address:
-    #     return self.get_new_addresses
+    def _reattach(self,
+                  bundle: Bundle) -> Bundle:
+        response = self._iota_api.replay_bundle(
+            bundle.tail_transaction.hash,
+            DEPTH,
+        )
+        return Bundle.from_tryte_strings(response['trytes'])
 
-    def get_addresses(self,
-                      index: int = 0,
-                      count: int = 1) -> Iterable[Address]:
-        response = self._iota_api.get_new_addresses(index, count)
-        return cast(Iterable[Address], response['addresses'])
+    def create_new_address(self) -> Address:
+        response = self._iota_api.get_new_addresses(count=None)
+        address = response['addresses'][0]
 
-    def get_balances(self,
-                     *addresses: Iterable[Address]) -> Iterable[int]:
-        response = self._iota_api.get_balances(addresses)
-        return cast(Iterable[int], response['balances'])
-
-    def attach_address(self,
-                       address: Address) -> None:
+        # Attach the address
         proposed_transaction = ProposedTransaction(address, value=0)
         self._iota_api.send_transfer(depth=DEPTH, transfers=[proposed_transaction])
+
+        return address
+
+    def retry_unconfirmed_bundles(self,
+                                  *bundles: Bundle) -> None:
+        if len(bundles) == 0:
+            bundles = tuple(self.bundles['unconfirmed'])
+        for bundle in bundles:
+            print(f'Retrying bundle: {bundle.hash}')
+            if not self._is_promotable(bundle):
+                bundle = self._reattach(bundle)
+                while True:
+                    time.sleep(2)
+                    if self._is_promotable(bundle):
+                        break
+            for attempt in range(5):
+                try:
+                    promote_bundle = self._promote(bundle)
+                except BundleAlreadyPromoted:
+                    break
+                else:
+                    print(f'Promotion attempt ({attempt}): Bundle {promote_bundle.hash}')
