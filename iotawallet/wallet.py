@@ -75,6 +75,8 @@ class Wallet:
     @property
     def account(self) -> _Account:
         if self._account is None:
+            print('Getting account balance, addresses, etc... ' +
+                  'This will take some time...')
             self._account = self._get_account()
         return self._account
 
