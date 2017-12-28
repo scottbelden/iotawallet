@@ -1,7 +1,7 @@
 import time
 from typing import cast, List, Dict, Iterable, Optional
 
-from iota import (
+from iota import (  # noqa: F401
     Iota, ProposedTransaction, Address, Bundle, TransactionHash, Transaction
 )
 
@@ -28,8 +28,8 @@ class _Account:
             bundle.hash: bundle for bundle in bundles if bundle.is_confirmed
         }
 
-        duplicates: List[Bundle] = []
-        unconfirmed: Dict[TransactionHash, Bundle] = {}
+        duplicates = []  # type: List[Bundle]
+        unconfirmed = {}  # type: Dict[TransactionHash, Bundle]
 
         for bundle in bundles:
             if bundle.is_confirmed:
@@ -69,7 +69,7 @@ class Wallet:
     def __init__(self,
                  uri: str,
                  seed: Optional[str] = None) -> None:
-        self._account: Optional[_Account] = None
+        self._account = None  # type: Optional[_Account]
         self._iota_api = Iota(uri, seed)
 
     @property
@@ -166,7 +166,7 @@ class Wallet:
         if len(bundles) == 0:
             bundles = tuple(self.bundles['unconfirmed'])
         for bundle in bundles:
-            print(f'Retrying bundle: {bundle.hash}')
+            print('Retrying bundle: {hash}'.format(hash=bundle.hash))
             if not self._is_promotable(bundle):
                 bundle = self._reattach(bundle)
                 while True:
@@ -179,15 +179,16 @@ class Wallet:
                 except BundleAlreadyPromoted:
                     break
                 else:
-                    print(f'Promotion attempt ({attempt}): Bundle {promote_bundle.hash}')
+                    msg = 'Promotion attempt ({attempt}): Bundle {hash}'
+                    print(msg.format(attempt=attempt, hash=promote_bundle.hash))
 
     def send(self,
              address: str,
              value: int) -> None:
-        print(f'Sending {value} iota to {address}...')
+        print('Sending {value} iota to {address}...'.format(value=value, address=address))
         response = self._iota_api.send_transfer(
             depth=DEPTH,
             transfers=[ProposedTransaction(Address(address), value=value)]
         )
         bundle = response['bundle']
-        print(f'Iota sent! Bundle hash: {bundle.hash}')
+        print('Iota sent! Bundle hash: {hash}'.format(hash=bundle.hash))
