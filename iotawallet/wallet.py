@@ -69,26 +69,29 @@ class Wallet:
     def __init__(self,
                  uri: str,
                  seed: Optional[str] = None) -> None:
+        self._account: Optional[_Account] = None
         self._iota_api = Iota(uri, seed)
-        self.uri = uri
-        self.seed = self._iota_api.seed
 
-        self._account = self._get_account()
+    @property
+    def account(self) -> _Account:
+        if self._account is None:
+            self._account = self._get_account()
+        return self._account
 
     @property
     def addresses(self) -> List[Address]:
-        return self._account.addresses
+        return self.account.addresses
 
     @property
     def balance(self) -> int:
-        return self._account.balance
+        return self.account.balance
 
     @property
     def bundles(self) -> Dict[str, Iterable[Bundle]]:
         return {
-            'confirmed': self._account.confirmed_bundles,
-            'unconfirmed': self._account.unconfirmed_bundles,
-            'duplicate': self._account.duplicate_bundles,
+            'confirmed': self.account.confirmed_bundles,
+            'unconfirmed': self.account.unconfirmed_bundles,
+            'duplicate': self.account.duplicate_bundles,
         }
 
     def _get_account(self) -> _Account:
@@ -149,8 +152,10 @@ class Wallet:
         address = response['addresses'][0]
 
         # Attach the address
-        proposed_transaction = ProposedTransaction(address, value=0)
-        self._iota_api.send_transfer(depth=DEPTH, transfers=[proposed_transaction])
+        self._iota_api.send_transfer(
+            depth=DEPTH,
+            transfers=[ProposedTransaction(address, value=0)],
+        )
 
         return address
 
@@ -173,3 +178,14 @@ class Wallet:
                     break
                 else:
                     print(f'Promotion attempt ({attempt}): Bundle {promote_bundle.hash}')
+
+    def send(self,
+             address: str,
+             value: int) -> None:
+        print(f'Sending {value} iota to {address}...')
+        response = self._iota_api.send_transfer(
+            depth=DEPTH,
+            transfers=[ProposedTransaction(Address(address), value=value)]
+        )
+        bundle = response['bundle']
+        print(f'Iota sent! Bundle hash: {bundle.hash}')

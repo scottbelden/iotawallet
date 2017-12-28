@@ -4,5 +4,8 @@ from iotawallet import Wallet
 uri = input('Node URI: ')
 seed = getpass.getpass(prompt='Seed: ')
 
+address = input('Receiving adddress: ')
+value = int(input('Iota to send: '))
+
 wallet = Wallet(uri, seed)
-wallet.retry_unconfirmed_bundles()
+wallet.send(address=address, value=value)
