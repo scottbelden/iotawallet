@@ -8,7 +8,7 @@ setup(
     name = 'iotawallet',
     description = 'Python implementation of an Iota Wallet',
     url = 'https://github.com/scottbelden/iotawallet',
-    version = '0.0.1',
+    version = '0.0.2',
     packages = find_packages('.', exclude=('test',)),
     include_package_data  = True,
     entry_points = {
