@@ -69,16 +69,17 @@ class Wallet:
     def __init__(self,
                  uri: str,
                  seed: Optional[str] = None) -> None:
-        self._account = None  # type: Optional[_Account]
         self._iota_api = Iota(uri, seed)
 
     @property
     def account(self) -> _Account:
-        if self._account is None:
-            print('Getting account balance, addresses, etc... ' +
-                  'This will take some time...')
-            self._account = self._get_account()
-        return self._account
+        try:
+            return self._account
+        except AttributeError:
+            # We get an attibute error if we check this property before ever
+            # calling refresh_account.
+            self.refresh_account()
+            return self._account
 
     @property
     def addresses(self) -> List[Address]:
@@ -95,14 +96,6 @@ class Wallet:
             'unconfirmed': self.account.unconfirmed_bundles,
             'duplicate': self.account.duplicate_bundles,
         }
-
-    def _get_account(self) -> _Account:
-        response = self._iota_api.get_account_data(inclusion_states=True)
-        addresses = response['addresses']
-        balance = response['balance']
-        bundles = response['bundles']
-
-        return _Account(addresses, balance, bundles)
 
     def _is_above_max_depth(self,
                             transaction: Transaction) -> bool:
@@ -160,6 +153,14 @@ class Wallet:
         )
 
         return address
+
+    def refresh_account(self) -> None:
+        response = self._iota_api.get_account_data(inclusion_states=True)
+        addresses = response['addresses']
+        balance = response['balance']
+        bundles = response['bundles']
+
+        self._account = _Account(addresses, balance, bundles)
 
     def retry_unconfirmed_bundles(self,
                                   *bundles: Bundle) -> None:
