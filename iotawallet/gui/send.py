@@ -34,3 +34,11 @@ class SendTab(wx.Panel):
         hbox.Add(vbox, proportion=1, flag=(wx.CENTER | wx.ALL))
         hbox.Add(SPACER, proportion=1)
         self.SetSizer(hbox)
+
+
+if __name__ == '__main__':
+    app = wx.App()
+    frame = wx.Frame(None, title='SendTab', size=(1000, 600))
+    panel = SendTab(frame, None)
+    frame.Show()
+    app.MainLoop()

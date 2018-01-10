@@ -6,6 +6,9 @@ import wx
 from iota.adapter import resolve_adapter
 from iota.commands.core import GetNodeInfoCommand
 
+from .history import HistoryTab
+from .overview import OverviewTab
+from .receive import ReceiveTab
 from .send import SendTab
 from ..wallet import Wallet
 
@@ -129,33 +132,6 @@ class WalletWindow(wx.Frame):
 
         self.panel.SetSizer(sizer)
         self.panel.Layout()
-
-
-class OverviewTab(wx.Panel):
-    def __init__(self, parent, wallet):
-        super().__init__(parent)
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        text = wx.StaticText(self, label=f'Balance: {wallet.balance}')
-        sizer.Add(text, flag=wx.ALL)
-        self.SetSizer(sizer)
-
-
-class ReceiveTab(wx.Panel):
-    def __init__(self, parent, wallet):
-        super().__init__(parent)
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        text = wx.StaticText(self, label='Receive')
-        sizer.Add(text, flag=wx.ALL)
-        self.SetSizer(sizer)
-
-
-class HistoryTab(wx.Panel):
-    def __init__(self, parent, wallet):
-        super().__init__(parent)
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        text = wx.StaticText(self, label='History')
-        sizer.Add(text, flag=wx.ALL)
-        self.SetSizer(sizer)
 
 
 class WorkerThread:
