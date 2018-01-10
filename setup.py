@@ -18,7 +18,7 @@ setup(
     include_package_data  = True,
     entry_points = {
         'console_scripts': [
-            'iotawallet=iotawallet.wxapp:main',
+            'iotawallet=iotawallet.gui.wxapp:main',
         ],
     },
     install_requires = install_requires,

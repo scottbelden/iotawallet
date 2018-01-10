@@ -1,2 +1,2 @@
-import iotawallet.wxapp
-iotawallet.wxapp.main()
+import iotawallet.gui.wxapp
+iotawallet.gui.wxapp.main()

@@ -6,7 +6,8 @@ import wx
 from iota.adapter import resolve_adapter
 from iota.commands.core import GetNodeInfoCommand
 
-from .wallet import Wallet
+from .send import SendTab
+from ..wallet import Wallet
 
 DEFAULT_URI = 'https://iotanode.us:443'
 
@@ -56,7 +57,7 @@ class WalletWindow(wx.Frame):
 
         self._update_milestone_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._update_milestone, self._update_milestone_timer)
-        self._update_milestone_timer.Start(3 * 1000)
+        self._update_milestone_timer.Start(15 * 1000)
 
     def _update_milestone(self, event=None):
         response = GetNodeInfoCommand(resolve_adapter(DEFAULT_URI))()
@@ -135,15 +136,6 @@ class OverviewTab(wx.Panel):
         super().__init__(parent)
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         text = wx.StaticText(self, label=f'Balance: {wallet.balance}')
-        sizer.Add(text, flag=wx.ALL)
-        self.SetSizer(sizer)
-
-
-class SendTab(wx.Panel):
-    def __init__(self, parent, wallet):
-        super().__init__(parent)
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        text = wx.StaticText(self, label='Send')
         sizer.Add(text, flag=wx.ALL)
         self.SetSizer(sizer)
 
