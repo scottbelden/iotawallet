@@ -3,7 +3,6 @@ import traceback
 import threading
 
 import wx
-from wx.aui import AuiNotebook
 from iota.adapter import resolve_adapter
 from iota.commands.core import GetNodeInfoCommand
 
@@ -40,8 +39,8 @@ class WalletWindow(wx.Frame):
         login_vbox.Add(self.login_button, proportion=1, flag=wx.EXPAND)
 
         vbox = wx.BoxSizer(wx.VERTICAL)
-        vbox.Add(hbox, proportion=2, flag=wx.CENTER|wx.ALL, border=20)
-        vbox.Add(login_vbox, proportion=1, flag=wx.EXPAND|wx.ALL, border=20)
+        vbox.Add(hbox, proportion=2, flag=(wx.CENTER | wx.ALL), border=20)
+        vbox.Add(login_vbox, proportion=1, flag=(wx.EXPAND | wx.ALL), border=20)
 
         self.panel.SetSizer(vbox)
         self.panel.Layout()
@@ -125,7 +124,7 @@ class WalletWindow(wx.Frame):
         notebook.AddPage(history_tab, 'History')
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(notebook, flag=wx.EXPAND|wx.ALL, proportion=1)
+        sizer.Add(notebook, flag=(wx.EXPAND | wx.ALL), proportion=1)
 
         self.panel.SetSizer(sizer)
         self.panel.Layout()

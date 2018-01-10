@@ -13,7 +13,7 @@ setup(
     name = 'iotawallet',
     description = 'Python implementation of an Iota Wallet',
     url = 'https://github.com/scottbelden/iotawallet',
-    version = '0.0.4',
+    version = '0.0.5',
     packages = find_packages('.', exclude=('test',)),
     include_package_data  = True,
     entry_points = {
@@ -27,7 +27,6 @@ setup(
       'Intended Audience :: Developers',
       'License :: OSI Approved :: MIT License',
       'Programming Language :: Python :: 3',
-      'Programming Language :: Python :: 3.5',
       'Programming Language :: Python :: 3.6',
       'Topic :: Software Development :: Libraries :: Python Modules',
     ],

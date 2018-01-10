@@ -70,6 +70,7 @@ class Wallet:
                  uri: str,
                  seed: Optional[str] = None) -> None:
         self._iota_api = Iota(uri, seed)
+        self._account: _Account
 
     @property
     def account(self) -> _Account:
@@ -154,7 +155,7 @@ class Wallet:
         if len(bundles) == 0:
             bundles = tuple(self.bundles['unconfirmed'])
         for bundle in bundles:
-            print('Retrying bundle: {hash}'.format(hash=bundle.hash))
+            print(f'Retrying bundle: {bundle.hash}')
             if not self._is_promotable(bundle):
                 bundle = self._reattach(bundle)
                 while True:
@@ -167,16 +168,15 @@ class Wallet:
                 except BundleAlreadyPromoted:
                     break
                 else:
-                    msg = 'Promotion attempt ({attempt}): Bundle {hash}'
-                    print(msg.format(attempt=attempt, hash=promote_bundle.hash))
+                    print(f'Promotion attempt ({attempt}): Bundle {promote_bundle.hash}')
 
     def send(self,
              address: str,
              value: int) -> None:
-        print('Sending {value} iota to {address}...'.format(value=value, address=address))
+        print(f'Sending {value} iota to {address}...')
         response = self._iota_api.send_transfer(
             depth=DEPTH,
             transfers=[ProposedTransaction(Address(address), value=value)]
         )
         bundle = response['bundle']
-        print('Iota sent! Bundle hash: {hash}'.format(hash=bundle.hash))
+        print(f'Iota sent! Bundle hash: {bundle.hash}')
