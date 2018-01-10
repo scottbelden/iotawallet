@@ -21,6 +21,6 @@ Once installed run ``iotawallet``
 Dependencies
 ============
 
-`GTK`_
+`wxPython`_
 
-.. _GTK: http://pygobject.readthedocs.io/en/latest/getting_started.html
+.. _wxPython: https://www.wxpython.org/

@@ -118,20 +118,7 @@ class Wallet:
         if response['states'][tail_hash]:
             raise BundleAlreadyPromoted()
 
-        spam_transfer = ProposedTransaction(
-            address=Address(b'9' * 81),
-            value=0,
-        )
-        options = {
-            'reference': tail_hash
-        }
-
-        response = self._iota_api.send_transfer(
-            seed=spam_transfer.address,
-            depth=DEPTH,
-            transfers=[spam_transfer],
-            options=options,
-        )
+        response = self._iota_api.promote_transaction(transaction=tail_hash, depth=DEPTH)
         return response['bundle']
 
     def _reattach(self,
