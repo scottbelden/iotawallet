@@ -1,15 +1,19 @@
 import wx
 
+from ..wallet import Wallet
+
 SPACER = (0, 0)
 
 
-class SendTab(wx.Panel):
-    def __init__(self, parent, wallet):
+class SendTab(wx.Panel):  # type: ignore
+    def __init__(self,
+                 parent: wx.Window,
+                 wallet: Wallet) -> None:
         super().__init__(parent)
         self.wallet = wallet
         self.create_send_tab()
 
-    def create_send_tab(self):
+    def create_send_tab(self) -> None:
         receive_text = wx.StaticText(self, label='Receiver Address: ')
         self.receive_address_input = wx.TextCtrl(self)
 
@@ -38,7 +42,8 @@ class SendTab(wx.Panel):
 
         self.Bind(wx.EVT_BUTTON, self.send_button_clicked, send_button)
 
-    def send_button_clicked(self, event):
+    def send_button_clicked(self,
+                            event: wx.CommandEvent) -> None:
         address = self.receive_address_input.GetLineText(0)
         iota_amount = int(self.amount_input.GetLineText(0))
 
@@ -47,7 +52,9 @@ class SendTab(wx.Panel):
         else:
             self.show_confirm_send_dialog(address, iota_amount)
 
-    def show_confirm_send_dialog(self, address, iota_amount):
+    def show_confirm_send_dialog(self,
+                                 address: str,
+                                 iota_amount: int) -> None:
         message = (f'You are about to send\n\n' +
                    f'{iota_amount} iota\n\n' +
                    f'to {address}')
@@ -61,7 +68,8 @@ class SendTab(wx.Panel):
         if response == wx.ID_YES:
             self.wallet.send(address, iota_amount)
 
-    def show_insufficient_balance_dialog(self, iota_amount):
+    def show_insufficient_balance_dialog(self,
+                                         iota_amount: int) -> None:
         dialog = wx.MessageDialog(
             self,
             message=f'You do not have enough funds to send {iota_amount} iota',
@@ -75,6 +83,6 @@ if __name__ == '__main__':
     frame = wx.Frame(None, title='SendTab', size=(1000, 600))
     from collections import namedtuple
     wallet = namedtuple('wallet', ['balance'])
-    panel = SendTab(frame, wallet(balance=1))
+    panel = SendTab(frame, wallet(balance=1))  # type: ignore
     frame.Show()
     app.MainLoop()

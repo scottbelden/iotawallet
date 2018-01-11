@@ -1,14 +1,18 @@
 import wx
 
+from ..wallet import Wallet
 
-class ReceiveTab(wx.Panel):
-    def __init__(self, parent, wallet):
+
+class ReceiveTab(wx.Panel):  # type: ignore
+    def __init__(self,
+                 parent: wx.Window,
+                 wallet: Wallet) -> None:
         super().__init__(parent)
         self.wallet = wallet
         self.init_popup_menu()
         self.create_receive_tab()
 
-    def create_receive_tab(self):
+    def create_receive_tab(self) -> None:
         receive_text = wx.StaticText(self, label='Receive Addresses: ')
 
         self.list_ctrl = wx.ListCtrl(self, style=wx.LC_REPORT)
@@ -33,11 +37,12 @@ class ReceiveTab(wx.Panel):
 
         self.SetSizer(hbox)
 
-    def init_popup_menu(self):
+    def init_popup_menu(self) -> None:
         self.popup_menu = wx.Menu()
         self.popup_menu.Append(0, 'Copy Address')
 
-    def popup_menu_clicked(self, event):
+    def popup_menu_clicked(self,
+                           event: wx.ContextMenuEvent) -> None:
         index = event.GetId()
         if index == 0:
             # Copy
@@ -47,11 +52,13 @@ class ReceiveTab(wx.Panel):
                 wx.TheClipboard.SetData(wx.TextDataObject(text=address))
             wx.TheClipboard.Close()
 
-    def new_address_button_clicked(self, event):
+    def new_address_button_clicked(self,
+                                   event: wx.CommandEvent) -> None:
         new_address = self.wallet.create_new_address()
         self.list_ctrl.Append([new_address])
 
-    def address_right_click(self, event):
+    def address_right_click(self,
+                            event: wx.ListEvent) -> None:
         address = event.GetText()
         if address:
             self.PopupMenu(self.popup_menu)
@@ -63,6 +70,6 @@ if __name__ == '__main__':
     from collections import namedtuple
     wallet = namedtuple('wallet', ['addresses'])
     from iota import Address
-    panel = ReceiveTab(frame, wallet(addresses=[Address('ASDF'), Address('QWER')]))
+    panel = ReceiveTab(frame, wallet(addresses=[Address('ASDF'), Address('QWER')]))  # type: ignore
     frame.Show()
     app.MainLoop()

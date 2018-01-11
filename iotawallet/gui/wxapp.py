@@ -1,6 +1,7 @@
 import queue
 import traceback
 import threading
+from typing import Any, Callable, Optional, Tuple
 
 import wx
 from iota.adapter import resolve_adapter
@@ -12,11 +13,12 @@ from .receive import ReceiveTab
 from .send import SendTab
 from ..wallet import Wallet
 
+QueueType = Tuple[Callable, Tuple, Optional[Callable]]
 DEFAULT_URI = 'https://iotanode.us:443'
 
 
-class WalletWindow(wx.Frame):
-    def __init__(self):
+class WalletWindow(wx.Frame):  # type: ignore
+    def __init__(self) -> None:
         super().__init__(
             None,
             title='Iota Wallet',
@@ -29,7 +31,7 @@ class WalletWindow(wx.Frame):
         self.create_status_bar()
         self.add_login_ui()
 
-    def add_login_ui(self):
+    def add_login_ui(self) -> None:
 
         # TODO: Change this to an icon
         text = wx.StaticText(self.panel, label='Iota Wallet')
@@ -51,7 +53,7 @@ class WalletWindow(wx.Frame):
 
         self.Bind(wx.EVT_BUTTON, self.on_login_clicked, self.login_button)
 
-    def create_status_bar(self):
+    def create_status_bar(self) -> None:
         self.status_bar = self.CreateStatusBar()
 
         # Get the milestone status the first time then set up a timer to
@@ -62,7 +64,8 @@ class WalletWindow(wx.Frame):
         self.Bind(wx.EVT_TIMER, self._update_milestone, self._update_milestone_timer)
         self._update_milestone_timer.Start(15 * 1000)
 
-    def _update_milestone(self, event=None):
+    def _update_milestone(self,
+                          event: Optional[wx.TimerEvent] = None) -> None:
         response = GetNodeInfoCommand(resolve_adapter(DEFAULT_URI))()
         current_milestone = response['latestSolidSubtangleMilestoneIndex']
         latest_milestone = response['latestMilestoneIndex']
@@ -74,7 +77,8 @@ class WalletWindow(wx.Frame):
 
         self.status_bar.PushStatusText(status)
 
-    def on_login_clicked(self, event):
+    def on_login_clicked(self,
+                         event: wx.CommandEvent) -> None:
         seed = self.seed_input.GetLineText(0)
 
         # Check seed
@@ -99,22 +103,24 @@ class WalletWindow(wx.Frame):
             self.worker.send(self.wallet.refresh_account, callback=self.after_account)
             self.disable_login_button('Logging in...')
 
-    def disable_login_button(self, label):
+    def disable_login_button(self,
+                             label: str) -> None:
         self.login_button.SetLabel(label)
         self.login_button.Disable()
 
-    def reenable_login_button(self):
+    def reenable_login_button(self) -> None:
         self.login_button.Enable()
         self.login_button.SetLabel('Login')
 
-    def after_account(self, result):
+    def after_account(self,
+                      result: Any) -> None:
         self.transition_to_main_ui()
 
-    def transition_to_main_ui(self):
+    def transition_to_main_ui(self) -> None:
         self.panel.DestroyChildren()
         self.create_main_ui()
 
-    def create_main_ui(self):
+    def create_main_ui(self) -> None:
         notebook = wx.Notebook(self.panel)
 
         overview_tab = OverviewTab(notebook, self.wallet)
@@ -135,13 +141,13 @@ class WalletWindow(wx.Frame):
 
 
 class WorkerThread:
-    def __init__(self):
+    def __init__(self) -> None:
         self.thread = threading.Thread(target=self._run)
         self.thread.daemon = True
-        self.queue = queue.Queue()
+        self.queue: queue.Queue[QueueType] = queue.Queue()
         self.thread.start()
 
-    def _run(self):
+    def _run(self) -> None:
         while True:
             command, args, callback = self.queue.get()
             try:
@@ -151,11 +157,14 @@ class WorkerThread:
             except Exception as e:
                 traceback.print_exc()
 
-    def send(self, command, args=(), callback=None):
+    def send(self,
+             command: Callable,
+             args: Tuple = (),
+             callback: Optional[Callable] = None) -> None:
         self.queue.put((command, args, callback))
 
 
-def main():
+def main() -> None:
     app = wx.App()
     wallet = WalletWindow()
     wallet.Show()
