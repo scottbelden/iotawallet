@@ -1,7 +1,7 @@
 import queue
 import traceback
 import threading
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Callable, Dict, Optional, Tuple
 
 import wx
 from iota.adapter import resolve_adapter
@@ -26,6 +26,7 @@ class WalletWindow(wx.Frame):  # type: ignore
         )
 
         self.worker = WorkerThread()
+        self.milestone_worker = WorkerThread()
 
         self.panel = wx.Panel(self)
         self.create_status_bar()
@@ -55,6 +56,7 @@ class WalletWindow(wx.Frame):  # type: ignore
 
     def create_status_bar(self) -> None:
         self.status_bar = self.CreateStatusBar()
+        self.status_bar.PushStatusText('Getting milestone status...')
 
         # Get the milestone status the first time then set up a timer to
         # periodically check it
@@ -66,7 +68,13 @@ class WalletWindow(wx.Frame):  # type: ignore
 
     def _update_milestone(self,
                           event: Optional[wx.TimerEvent] = None) -> None:
-        response = GetNodeInfoCommand(resolve_adapter(DEFAULT_URI))()
+        self.milestone_worker.send(
+            GetNodeInfoCommand(resolve_adapter(DEFAULT_URI)),
+            callback=self._handle_update_milestone_response,
+        )
+
+    def _handle_update_milestone_response(self,
+                                          response: Dict) -> None:
         current_milestone = response['latestSolidSubtangleMilestoneIndex']
         latest_milestone = response['latestMilestoneIndex']
 
