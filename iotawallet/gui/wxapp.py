@@ -1,7 +1,4 @@
-import queue
-import traceback
-import threading
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 
 import wx
 from iota.adapter import resolve_adapter
@@ -11,9 +8,9 @@ from .history import HistoryTab
 from .overview import OverviewTab
 from .receive import ReceiveTab
 from .send import SendTab
+from .worker import WorkerThread
 from ..wallet import Wallet
 
-QueueType = Tuple[Callable, Tuple, Optional[Callable]]
 DEFAULT_URI = 'https://iotanode.us:443'
 
 
@@ -146,30 +143,6 @@ class WalletWindow(wx.Frame):  # type: ignore
 
         self.panel.SetSizer(sizer)
         self.panel.Layout()
-
-
-class WorkerThread:
-    def __init__(self) -> None:
-        self.thread = threading.Thread(target=self._run)
-        self.thread.daemon = True
-        self.queue: queue.Queue[QueueType] = queue.Queue()
-        self.thread.start()
-
-    def _run(self) -> None:
-        while True:
-            command, args, callback = self.queue.get()
-            try:
-                result = command(*args)
-                if callback:
-                    wx.CallAfter(callback, result)
-            except Exception as e:
-                traceback.print_exc()
-
-    def send(self,
-             command: Callable,
-             args: Tuple = (),
-             callback: Optional[Callable] = None) -> None:
-        self.queue.put((command, args, callback))
 
 
 def main() -> None:

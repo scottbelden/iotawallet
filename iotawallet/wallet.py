@@ -109,7 +109,7 @@ class Wallet:
                        bundle: Bundle) -> bool:
         return (
             self._is_above_max_depth(bundle.tail_transaction) and
-            self._iota_api.is_promotable(bundle.tail_transaction.hash)
+            self._iota_api.helpers.is_promotable(bundle.tail_transaction.hash)
         )
 
     def _promote(self,
