@@ -1,7 +1,25 @@
 language: python
 python:
     - 3.6
+addons:
+    apt:
+        packages:
+            - libwebkitgtk-dev
+            - libjpeg-dev
+            - libtiff-dev
+            - libgtk2.0-dev
+            - libsdl1.2-dev
+            - libgstreamer-plugins-base0.10-dev
+            - freeglut3
+            - freeglut3-dev
+            - libnotify-dev
+            - libsm-dev
+            - libgtk-3-dev
+            - libwebkitgtk-3.0-dev
 install:
-    - pip install wxpython mypy flake8 pytest coverage
+    - sudo apt-get update
+    - wget "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-14.04/wxPython-4.0.1-cp36-cp36m-linux_x86_64.whl"
+    - pip install wxPython-4.0.1-cp36-cp36m-linux_x86_64.whl
+    - pip install pyota mypy flake8 pytest coverage
 script:
-    - ./run_tests.sh
+    - xvfb-run --server-args="-screen 0 1024x768x24" ./run_tests.sh
