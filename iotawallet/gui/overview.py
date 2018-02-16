@@ -16,13 +16,3 @@ class OverviewTab(wx.Panel):  # type: ignore
         balance_text = wx.StaticText(self, label=f'Balance: {self.wallet.balance}')
         hbox.Add(balance_text, flag=wx.ALL)
         self.SetSizer(hbox)
-
-
-if __name__ == '__main__':
-    app = wx.App()
-    frame = wx.Frame(None, title='OverviewTab', size=(1000, 600))
-    from collections import namedtuple
-    wallet = namedtuple('wallet', ['balance'])
-    panel = OverviewTab(frame, wallet(balance=1))  # type: ignore
-    frame.Show()
-    app.MainLoop()

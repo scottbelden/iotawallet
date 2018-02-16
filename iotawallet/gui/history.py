@@ -70,11 +70,3 @@ class HistoryTab(wx.Panel):  # type: ignore
                                  event: wx.ListEvent) -> None:
         if event.GetText():
             self.PopupMenu(self.popup_menu)
-
-
-if __name__ == '__main__':
-    app = wx.App()
-    frame = wx.Frame(None, title='HistoryTab', size=(1000, 600))
-    panel = HistoryTab(frame, None)  # type: ignore
-    frame.Show()
-    app.MainLoop()

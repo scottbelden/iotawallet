@@ -2,6 +2,8 @@ import wx
 
 from ..wallet import Wallet
 
+DEFAULT_COLUMN_WIDTH = 100
+
 
 class ReceiveTab(wx.Panel):  # type: ignore
     def __init__(self,
@@ -17,9 +19,15 @@ class ReceiveTab(wx.Panel):  # type: ignore
 
         self.list_ctrl = wx.ListCtrl(self, style=wx.LC_REPORT)
         self.list_ctrl.InsertColumn(0, 'Addresses')
-        for address in self.wallet.addresses:
-            self.list_ctrl.Append([str(address)])
-        self.list_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+
+        if self.wallet.addresses:
+            for address in self.wallet.addresses:
+                self.list_ctrl.Append([str(address)])
+            column_width = wx.LIST_AUTOSIZE
+        else:
+            column_width = DEFAULT_COLUMN_WIDTH
+
+        self.list_ctrl.SetColumnWidth(0, column_width)
 
         new_address_button = wx.Button(self, label='Generate New Address')
 
@@ -62,14 +70,3 @@ class ReceiveTab(wx.Panel):  # type: ignore
         address = event.GetText()
         if address:
             self.PopupMenu(self.popup_menu)
-
-
-if __name__ == '__main__':
-    app = wx.App()
-    frame = wx.Frame(None, title='ReceiveTab', size=(1000, 600))
-    from collections import namedtuple
-    wallet = namedtuple('wallet', ['addresses'])
-    from iota import Address
-    panel = ReceiveTab(frame, wallet(addresses=[Address('ASDF'), Address('QWER')]))  # type: ignore
-    frame.Show()
-    app.MainLoop()

@@ -76,13 +76,3 @@ class SendTab(wx.Panel):  # type: ignore
             caption='Insufficient Balance',
         )
         dialog.ShowModal()
-
-
-if __name__ == '__main__':
-    app = wx.App()
-    frame = wx.Frame(None, title='SendTab', size=(1000, 600))
-    from collections import namedtuple
-    wallet = namedtuple('wallet', ['balance'])
-    panel = SendTab(frame, wallet(balance=1))  # type: ignore
-    frame.Show()
-    app.MainLoop()

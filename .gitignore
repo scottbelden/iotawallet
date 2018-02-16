@@ -1,6 +1,10 @@
 # Caches
 .mypy_cache/
+.pytest_cache/
 __pycache__/
+
+# Test artifacts
+.coverage
 
 # Distribution files
 iotawallet.egg-info/

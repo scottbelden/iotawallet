@@ -2,6 +2,6 @@ language: python
 python:
     - 3.6
 install:
-    - pip install mypy flake8
+    - pip install mypy flake8 pytest coverage
 script:
     - ./run_tests.sh
