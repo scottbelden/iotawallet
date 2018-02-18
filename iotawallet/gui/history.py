@@ -1,5 +1,6 @@
 import wx
 
+from .defaults import DEFAULT_COLUMN_WIDTH
 from .worker import WorkerThread
 from ..wallet import Wallet
 
@@ -28,8 +29,13 @@ class HistoryTab(wx.Panel):  # type: ignore
         for bundle in self.wallet.bundles['confirmed']:
             self.transactions.Append([str(bundle.hash), CONFIRMED])
 
-        self.transactions.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-        self.transactions.SetColumnWidth(1, wx.LIST_AUTOSIZE)
+        if self.transactions.GetItemCount() > 0:
+            column_width = wx.LIST_AUTOSIZE
+        else:
+            column_width = DEFAULT_COLUMN_WIDTH
+
+        self.transactions.SetColumnWidth(0, column_width)
+        self.transactions.SetColumnWidth(1, column_width)
 
         vbox = wx.BoxSizer(wx.VERTICAL)
         vbox.Add(self.transactions, proportion=1, flag=wx.EXPAND)

@@ -1,8 +1,7 @@
 import wx
 
+from .defaults import DEFAULT_COLUMN_WIDTH
 from ..wallet import Wallet
-
-DEFAULT_COLUMN_WIDTH = 100
 
 
 class ReceiveTab(wx.Panel):  # type: ignore
@@ -20,14 +19,13 @@ class ReceiveTab(wx.Panel):  # type: ignore
         self.list_ctrl = wx.ListCtrl(self, style=wx.LC_REPORT)
         self.list_ctrl.InsertColumn(0, 'Addresses')
 
-        if self.wallet.addresses:
-            for address in self.wallet.addresses:
-                self.list_ctrl.Append([str(address)])
-            column_width = wx.LIST_AUTOSIZE
-        else:
-            column_width = DEFAULT_COLUMN_WIDTH
+        for address in self.wallet.addresses:
+            self.list_ctrl.Append([str(address)])
 
-        self.list_ctrl.SetColumnWidth(0, column_width)
+        if self.list_ctrl.GetItemCount() > 0:
+            self.list_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+        else:
+            self.list_ctrl.SetColumnWidth(0, DEFAULT_COLUMN_WIDTH)
 
         new_address_button = wx.Button(self, label='Generate New Address')
 
