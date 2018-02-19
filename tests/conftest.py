@@ -43,8 +43,18 @@ def pytest_exception_interact(node, call, report):
         filename = os.path.join(SCREENSHOT_DIR, function_name + '.png')
         bmp.ConvertToImage().SaveFile(filename, wx.BITMAP_TYPE_PNG)
 
-    wx.CallLater(.25 * 1000, take_screenshot)
-    wx.CallLater(.5 * 1000, app.ExitMainLoop)
+    wx.CallLater(.1 * 1000, take_screenshot)
+    wx.CallLater(.2 * 1000, app.ExitMainLoop)
 
+    frame.Show()
+    app.MainLoop()
+
+
+def debug(frame):
+    """Helper function that can be used to debug the tests. When called, it
+    will render the frame so that one can interactively play with it.
+    """
+    app = wx.App()
+    frame.Bind(wx.EVT_CLOSE, lambda evt: app.ExitMainLoop())
     frame.Show()
     app.MainLoop()
